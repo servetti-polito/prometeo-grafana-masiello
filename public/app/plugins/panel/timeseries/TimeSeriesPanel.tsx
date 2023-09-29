@@ -62,6 +62,7 @@ export const TimeSeriesPanel = ({
 
   const enableAnnotationCreation = Boolean(canAddAnnotations && canAddAnnotations());
 
+  return <>Ciao</>
   return (
     <TimeSeries
       frames={frames}
