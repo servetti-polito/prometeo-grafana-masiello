@@ -7,7 +7,7 @@ import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { DashboardModel, PanelModel } from 'app/features/dashboard/state';
 import { StoreState } from 'app/types';
 
-import { DashboardPanel } from '../dashgrid/DashboardPanel';
+import { MyDashboardPanel } from '../dashgrid/MyDashboardPanel';
 import { initDashboard } from '../state/initDashboard';
 
 export interface DashboardPageRouteParams {
@@ -109,14 +109,14 @@ export const MySoloPanel = ({ dashboard, notFound, panel, panelId, timezone }: M
   }
 
   return (
-    <div className="mypanel-solo">
+    <div className="panel-solo">
       <AutoSizer>
         {({ width, height }) => {
           if (width === 0) {
             return null;
           }
           return (
-            <DashboardPanel
+            <MyDashboardPanel
               stateKey={panel.key}
               width={width}
               height={height}
