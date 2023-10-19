@@ -63,65 +63,6 @@ export const TimeSeriesPanel = ({
 
   const enableAnnotationCreation = Boolean(canAddAnnotations && canAddAnnotations());
 
-  return  <BarChart />
-};
-
-const data = [
-  { label: "A", value: 10 },
-  { label: "B", value: 20 },
-  { label: "C", value: 15 },
-  { label: "D", value: 25 },
-  { label: "E", value: 30 },
-];
-
-const BarChart = () => {
-  const svgRef = useRef();
-
-  useEffect(() => {
-    const svg = d3.select(svgRef.current);
-    const width = 400;
-    const height = 300;
-    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
-
-    svg.attr("width", width + margin.left + margin.right)
-       .attr("height", height + margin.top + margin.bottom);
-
-    const xScale = d3.scaleBand()
-                    .domain(data.map(d => d.label))
-                    .range([margin.left, width - margin.right])
-                    .padding(0.1);
-
-    const yScale = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.value)])
-                    .nice()
-                    .range([height - margin.bottom, margin.top]);
-
-    svg.selectAll(".bar")
-       .data(data)
-       .enter().append("rect")
-       .attr("class", "bar")
-       .attr("x", d => xScale(d.label))
-       .attr("y", d => yScale(d.value))
-       .attr("width", xScale.bandwidth())
-       .attr("height", d => yScale(0) - yScale(d.value))
-       .attr("fill", "steelblue");
-
-    svg.append("g")
-       .attr("class", "x-axis")
-       .attr("transform", `translate(0,${height - margin.bottom})`)
-       .call(d3.axisBottom(xScale));
-
-    svg.append("g")
-       .attr("class", "y-axis")
-       .attr("transform", `translate(${margin.left},0)`)
-       .call(d3.axisLeft(yScale));
-  }, []);
-
-  return <svg ref={svgRef}></svg>;
-};
-
-
-const TimeSeriesTmp = () => {
   return <TimeSeries
       frames={frames}
       structureRev={data.structureRev}

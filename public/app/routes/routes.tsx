@@ -80,6 +80,16 @@ export function getAppRoutes(): RouteDescriptor[] {
         () => import(/* webpackChunkName: "SoloPanelPage" */ '../features/dashboard/containers/SoloPanelPage')
       ),
     },
+    //MySoloPanelPage.tsx
+    {
+      path: '/myd-solo/:uid/:slug',
+      pageClass: 'dashboard-solo',
+      routeName: DashboardRoutes.Normal,
+      chromeless: true,
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "MySoloPanelPage" */ '../features/dashboard/containers/MySoloPanelPage')
+      ),
+    },
     // This route handles embedding of snapshot/scripted dashboard panels
     {
       path: '/dashboard-solo/:type/:slug',
