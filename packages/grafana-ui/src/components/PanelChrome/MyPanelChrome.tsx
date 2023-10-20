@@ -113,8 +113,8 @@ export function MyPanelChrome({
   loadingState,
   statusMessage,
   statusMessageOnClick,
-  leftItems,
-  actions,
+  leftItems, // deprecated
+  actions, // componenti react che si inseriscono in alto a destra
   onCancelQuery,
   onOpenMenu,
   collapsible = false,
