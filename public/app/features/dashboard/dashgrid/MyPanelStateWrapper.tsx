@@ -24,7 +24,7 @@ import { RefreshEvent } from '@grafana/runtime';
 import { VizLegendOptions } from '@grafana/schema';
 import {
   ErrorBoundary,
-  PanelChrome,
+  MyPanelChrome,
   PanelContext,
   PanelContextProvider,
   SeriesVisibilityChangeMode,
@@ -522,7 +522,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     const { errorMessage, data } = this.state;
     const { transparent } = panel;
 
-    const panelChromeProps = getPanelChromeProps({ ...this.props, data });
+    const MypanelChromeProps = getPanelChromeProps({ ...this.props, data });
 
     // Shift the hover menu down if it's on the top row so it doesn't get clipped by topnav
     const hoverHeaderOffset = (panel.gridPos?.y ?? 0) === 0 ? -16 : undefined;
@@ -534,24 +534,24 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     );
 
     return (
-      <PanelChrome
+      <MyPanelChrome
         width={width}
         height={height}
-        title={panelChromeProps.title}
+        title={MypanelChromeProps.title}
         loadingState={data.state}
         statusMessage={errorMessage}
-        statusMessageOnClick={panelChromeProps.onOpenErrorInspect}
-        description={panelChromeProps.description}
-        titleItems={panelChromeProps.titleItems}
+        statusMessageOnClick={MypanelChromeProps.onOpenErrorInspect}
+        description={MypanelChromeProps.description}
+        titleItems={MypanelChromeProps.titleItems}
         menu={this.props.hideMenu ? undefined : menu}
-        dragClass={panelChromeProps.dragClass}
+        dragClass={MypanelChromeProps.dragClass}
         dragClassCancel="grid-drag-cancel"
-        padding={panelChromeProps.padding}
+        padding={MypanelChromeProps.padding}
         hoverHeaderOffset={hoverHeaderOffset}
-        hoverHeader={panelChromeProps.hasOverlayHeader()}
+        hoverHeader={MypanelChromeProps.hasOverlayHeader()}
         displayMode={transparent ? 'transparent' : 'default'}
-        onCancelQuery={panelChromeProps.onCancelQuery}
-        onOpenMenu={panelChromeProps.onOpenMenu}
+        onCancelQuery={MypanelChromeProps.onCancelQuery}
+        onOpenMenu={MypanelChromeProps.onOpenMenu}
       >
         {(innerWidth, innerHeight) => (
           <>
@@ -569,7 +569,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
             </ErrorBoundary>
           </>
         )}
-      </PanelChrome>
+      </MyPanelChrome>
     );
   }
 }
