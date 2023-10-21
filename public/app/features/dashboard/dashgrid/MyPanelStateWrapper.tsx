@@ -490,7 +490,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     // Update the event filter (dashboard settings may have changed)
     // Yes this is called ever render for a function that is triggered on every mouse move
     this.eventFilter.onlyLocal = dashboard.graphTooltip === 0;
-
+    // Qui viene restiutito il grafico
     return (
       <>
         <PanelContextProvider value={this.state.context}>
@@ -533,6 +533,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
       </div>
     );
 
+    // Questo è il componente che contiene il grafico
     return (
       <MyPanelChrome
         width={width}
