@@ -99,14 +99,14 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
         sync: this.getSync,
         onSeriesColorChange: this.onSeriesColorChange,
         onToggleSeriesVisibility: this.onSeriesVisibilityChange,
-        onAnnotationCreate: this.onAnnotationCreate,
-        onAnnotationUpdate: this.onAnnotationUpdate,
-        onAnnotationDelete: this.onAnnotationDelete,
+        /*  onAnnotationCreate: this.onAnnotationCreate,
+          onAnnotationUpdate: this.onAnnotationUpdate,
+          onAnnotationDelete: this.onAnnotationDelete, Tolta possibilità di aggiungere annotazioni */
         onInstanceStateChange: this.onInstanceStateChange,
         onToggleLegendSort: this.onToggleLegendSort,
-        canAddAnnotations: props.dashboard.canAddAnnotations.bind(props.dashboard),
-        canEditAnnotations: props.dashboard.canEditAnnotations.bind(props.dashboard),
-        canDeleteAnnotations: props.dashboard.canDeleteAnnotations.bind(props.dashboard),
+        canAddAnnotations: false,
+        canEditAnnotations: false,
+        canDeleteAnnotations: false,// Rimosso toggle annotazione 
         onAddAdHocFilter: this.onAddAdHocFilter,
         onUpdateData: this.onUpdateData,
       },
@@ -509,7 +509,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
             replaceVariables={panel.replaceVariables}
             onOptionsChange={this.onOptionsChange}
             onFieldConfigChange={this.onFieldConfigChange}
-            onChangeTimeRange={this.onChangeTimeRange}
+            // onChangeTimeRange={this.onChangeTimeRange} Rimossa callback per cambiare il range di tempo
             eventBus={dashboard.events}
           />
         </PanelContextProvider>
