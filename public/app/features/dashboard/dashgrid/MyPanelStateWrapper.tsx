@@ -99,9 +99,9 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
         sync: this.getSync,
         onSeriesColorChange: this.onSeriesColorChange,
         onToggleSeriesVisibility: this.onSeriesVisibilityChange,
-        /*  onAnnotationCreate: this.onAnnotationCreate,
-          onAnnotationUpdate: this.onAnnotationUpdate,
-          onAnnotationDelete: this.onAnnotationDelete, Tolta possibilità di aggiungere annotazioni */
+        onAnnotationCreate: null,
+        onAnnotationUpdate: null,
+        onAnnotationDelete: null, //Tolta possibilità di aggiungere annotazioni 
         onInstanceStateChange: this.onInstanceStateChange,
         onToggleLegendSort: this.onToggleLegendSort,
         canAddAnnotations: false,
@@ -434,6 +434,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   onChangeTimeRange = (timeRange: AbsoluteTimeRange) => {
+    return;
     this.timeSrv.setTime({
       from: toUtc(timeRange.from),
       to: toUtc(timeRange.to),
@@ -509,7 +510,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
             replaceVariables={panel.replaceVariables}
             onOptionsChange={this.onOptionsChange}
             onFieldConfigChange={this.onFieldConfigChange}
-            // onChangeTimeRange={this.onChangeTimeRange} Rimossa callback per cambiare il range di tempo
+            onChangeTimeRange={this.onChangeTimeRange} // Rimossa callback per cambiare il range di tempo
             eventBus={dashboard.events}
           />
         </PanelContextProvider>
