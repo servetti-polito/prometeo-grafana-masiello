@@ -37,7 +37,6 @@ import { UnlinkModal } from '../../../library-panels/components/UnlinkModal/Unli
 import { isPanelModelLibraryPanel } from '../../../library-panels/guard';
 import { getVariablesByKey } from '../../../variables/state/selectors';
 import { DashboardPanel } from '../../dashgrid/DashboardPanel';
-import { MyDashboardPanel } from '../../dashgrid/MyDashboardPanel';
 import { DashboardModel, PanelModel } from '../../state';
 import { DashNavTimeControls } from '../DashNav/DashNavTimeControls';
 import { SaveDashboardDrawer } from '../SaveDashboard/SaveDashboardDrawer';

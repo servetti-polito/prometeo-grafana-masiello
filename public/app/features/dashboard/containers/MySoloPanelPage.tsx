@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
@@ -9,7 +9,6 @@ import { StoreState } from 'app/types';
 
 import { MyDashboardPanel } from '../dashgrid/MyDashboardPanel';
 import { initDashboard } from '../state/initDashboard';
-import { PanelEditor } from '../components/PanelEditor/PanelEditor';
 import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 
 export interface DashboardPageRouteParams {
