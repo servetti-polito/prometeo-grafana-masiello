@@ -37,6 +37,7 @@ import { UnlinkModal } from '../../../library-panels/components/UnlinkModal/Unli
 import { isPanelModelLibraryPanel } from '../../../library-panels/guard';
 import { getVariablesByKey } from '../../../variables/state/selectors';
 import { DashboardPanel } from '../../dashgrid/DashboardPanel';
+import { MyDashboardPanel } from '../../dashgrid/MyDashboardPanel';
 import { DashboardModel, PanelModel } from '../../state';
 import { DashNavTimeControls } from '../DashNav/DashNavTimeControls';
 import { SaveDashboardDrawer } from '../SaveDashboard/SaveDashboardDrawer';
@@ -54,10 +55,11 @@ import { calculatePanelSize } from './utils';
 interface OwnProps {
   dashboard: DashboardModel;
   sourcePanel: PanelModel;
-  sectionNav: NavModel;
-  pageNav: NavModelItem;
+  sectionNav?: NavModel;
+  pageNav?: NavModelItem;
   className?: string;
   tab?: string;
+  flag: boolean;
 }
 
 const mapStateToProps = (state: StoreState, ownProps: OwnProps) => {
@@ -197,7 +199,7 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
 
     return (
       <div className={styles.mainPaneWrapper} key="panel">
-        {this.renderPanelToolbar(styles)}
+        {this.renderPanelToolbar(styles) /* Pannello che genera i toggle di modifica*/}
         <div className={styles.panelWrapper}>
           <AutoSizer>
             {({ width, height }) => {
@@ -238,6 +240,60 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
         </div>
       </div>
     );
+  }
+
+  MyrenderPanel(styles: EditorStyles, isOnlyPanel: boolean) {
+    const { dashboard, panel, uiState, tableViewEnabled, theme } = this.props;
+
+    return (
+      <div className={styles.mainPaneWrapper} key="panel">
+        <div className={styles.panelWrapper}>
+          <AutoSizer>
+            {({ width, height }) => {
+              if (width < 3 || height < 3) {
+                return null;
+              }
+              // If no tabs limit height so panel does not extend to edge
+              if (isOnlyPanel) {
+                height -= theme.spacing.gridSize * 2;
+              }
+
+              if (tableViewEnabled) {
+                return <PanelEditorTableView width={width} height={height} panel={panel} dashboard={dashboard} />;
+              }
+
+              const panelSize = calculatePanelSize(uiState.mode, width, height, panel);
+
+              return (
+                <div className={styles.centeringContainer} style={{ width, height }}>
+                  <div style={panelSize} data-panelid={panel.id}>
+                    <MyDashboardPanel
+                      key={panel.key}
+                      stateKey={panel.key}
+                      dashboard={dashboard}
+                      panel={panel}
+                      isEditing={true}
+                      isViewing={false}
+                      lazy={false}
+                      width={panelSize.width}
+                      height={panelSize.height}
+                    />
+                  </div>
+                </div>
+              );
+            }}
+          </AutoSizer>
+        </div>
+      </div>
+    );
+  }
+
+  renderPanelEmbed(uiState: PanelEditorUIState, styles: EditorStyles) {
+    const { plugin, tab } = this.props;
+    const tabs = getPanelEditorTabs(tab, plugin);
+    const isOnlyPanel = tabs.length === 0;
+    const panelPane = this.MyrenderPanel(styles, isOnlyPanel);
+    return <div className={styles.onlyPanel}>{panelPane}</div>;
   }
 
   renderPanelAndEditor(uiState: PanelEditorUIState, styles: EditorStyles) {
@@ -301,7 +357,7 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
     return (
       <div className={styles.panelToolbar}>
         <HorizontalGroup justify={variables.length > 0 ? 'space-between' : 'flex-end'} align="flex-start">
-          {this.renderTemplateVariables(styles)}
+          {this.renderTemplateVariables(styles) /* Render variabili */}
           <Stack gap={1}>
             <InlineSwitch
               label="Table view"
@@ -430,15 +486,15 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
   };
 
   render() {
-    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState } = this.props;
+    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState, flag } = this.props;
     const styles = getStyles(theme, this.props);
 
     if (!initDone) {
       return null;
     }
 
-    return (
-      <Page
+    return (<>
+      {!flag && <Page
         navModel={sectionNav}
         pageNav={pageNav}
         aria-label={selectors.components.PanelEditor.General.content}
@@ -479,7 +535,9 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
             />
           )}
         </div>
-      </Page>
+      </Page>}
+      {flag && this.renderPanelEmbed(uiState, styles)}
+    </>
     );
   }
 }

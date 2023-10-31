@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
@@ -9,6 +9,8 @@ import { StoreState } from 'app/types';
 
 import { MyDashboardPanel } from '../dashgrid/MyDashboardPanel';
 import { initDashboard } from '../state/initDashboard';
+import { PanelEditor } from '../components/PanelEditor/PanelEditor';
+import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 
 export interface DashboardPageRouteParams {
   uid?: string;
@@ -54,6 +56,19 @@ export class MySoloPanelPage extends Component<Props, State> {
       fixUrl: false,
       keybindingSrv: this.context.keybindings,
     });
+
+    const receiveMessage = (event: any) => {
+      console.log('riga 61 MySoloPanelPage.tsx');
+      if (event.origin === 'http://localhost:8080') {
+        const nextRange = {
+          from: 'now-' + event.data,
+          to: 'now',
+        };
+        getTimeSrv().setTime(nextRange);
+      }
+    };
+
+    window.addEventListener('message', receiveMessage);
   }
 
   getPanelId(): number {
@@ -81,6 +96,11 @@ export class MySoloPanelPage extends Component<Props, State> {
   }
 
   render() {
+    console.log(this.props.dashboard);
+    console.log(this.state.notFound);
+    console.log(this.state.panel);
+    console.log(this.props.queryParams);
+    console.log(this.getPanelId());
     return (
       <MySoloPanel
         dashboard={this.props.dashboard}
@@ -100,6 +120,23 @@ export interface MySoloPanelProps extends State {
 }
 
 export const MySoloPanel = ({ dashboard, notFound, panel, panelId, timezone }: MySoloPanelProps) => {
+ /* useEffect(() => {
+    const receiveMessage = (event: any) => {
+      if (event.origin === 'http://localhost:8080') {
+        const nextRange = {
+          from: 'now-' + event.data,
+          to: 'now',
+        };
+        getTimeSrv().setTime(nextRange);
+      }
+    };
+
+    window.addEventListener('message', receiveMessage);
+
+    return () => {
+      window.removeEventListener('message', receiveMessage);
+    };
+  }, []); // Assicurati di passare un array vuoto come dipendenza per assicurarti che questo effetto venga eseguito solo una volta */
   if (notFound) {
     return <div className="alert alert-error">Panel with id {panelId} not found</div>;
   }
@@ -116,17 +153,22 @@ export const MySoloPanel = ({ dashboard, notFound, panel, panelId, timezone }: M
             return null;
           }
           return (
-            <MyDashboardPanel
-              stateKey={panel.key}
-              width={width}
-              height={height}
+            /* <MyDashboardPanel
+               stateKey={panel.key}
+               width={width}
+               height={height}
+               dashboard={dashboard}
+               panel={panel}
+               isEditing={false}
+               isViewing={true}
+               lazy={false}
+               timezone={timezone}
+               hideMenu={true} // è il menù in alto a destra per modificare o fare lo share
+             /> */
+            <PanelEditor
               dashboard={dashboard}
-              panel={panel}
-              isEditing={false} // ???
-              isViewing={true}
-              lazy={false}
-              timezone={timezone}
-              hideMenu={true} // è il menù in alto a destra per modificare o fare lo share
+              sourcePanel={panel}
+              flag={true}
             />
           );
         }}
