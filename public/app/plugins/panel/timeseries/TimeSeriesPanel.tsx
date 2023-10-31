@@ -1,5 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react';
-import * as d3 from 'd3';
+import React, { useMemo } from 'react';
 
 import { PanelProps, DataFrameType } from '@grafana/data';
 import { PanelDataErrorView } from '@grafana/runtime';

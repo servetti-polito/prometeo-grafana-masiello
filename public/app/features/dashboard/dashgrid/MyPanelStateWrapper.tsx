@@ -99,14 +99,14 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
         sync: this.getSync,
         onSeriesColorChange: this.onSeriesColorChange,
         onToggleSeriesVisibility: this.onSeriesVisibilityChange,
-        onAnnotationCreate: null,
-        onAnnotationUpdate: null,
-        onAnnotationDelete: null, //Tolta possibilità di aggiungere annotazioni 
+        onAnnotationCreate: undefined,
+        onAnnotationUpdate: undefined,
+        onAnnotationDelete: undefined, //Tolta possibilità di aggiungere annotazioni 
         onInstanceStateChange: this.onInstanceStateChange,
         onToggleLegendSort: this.onToggleLegendSort,
-        canAddAnnotations: false,
-        canEditAnnotations: false,
-        canDeleteAnnotations: false,// Rimosso toggle annotazione 
+        canAddAnnotations: undefined,
+        canEditAnnotations: undefined,
+        canDeleteAnnotations: undefined,// Rimosso toggle annotazione 
         onAddAdHocFilter: this.onAddAdHocFilter,
         onUpdateData: this.onUpdateData,
       },
