@@ -408,7 +408,6 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
             tab={this.props.queryParams.tab}
             sectionNav={sectionNav}
             pageNav={pageNav}
-            flag={false}
           />
         )}
         {queryParams.editview && (

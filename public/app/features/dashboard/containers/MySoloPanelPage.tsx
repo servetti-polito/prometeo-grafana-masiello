@@ -132,22 +132,17 @@ export const MySoloPanel = ({ dashboard, notFound, panel, panelId, timezone }: M
             return null;
           }
           return (
-            /* <MyDashboardPanel
-               stateKey={panel.key}
-               width={width}
-               height={height}
-               dashboard={dashboard}
-               panel={panel}
-               isEditing={false}
-               isViewing={true}
-               lazy={false}
-               timezone={timezone}
-               hideMenu={true} // è il menù in alto a destra per modificare o fare lo share
-             /> */
-            <PanelEditor
+            <MyDashboardPanel
+              stateKey={panel.key}
+              width={width}
+              height={height}
               dashboard={dashboard}
-              sourcePanel={panel}
-              flag={true}
+              panel={panel}
+              isEditing={false}
+              isViewing={true}
+              lazy={false}
+              timezone={timezone}
+              hideMenu={true} // è il menù in alto a destra per modificare o fare lo share
             />
           );
         }}

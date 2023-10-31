@@ -55,11 +55,10 @@ import { calculatePanelSize } from './utils';
 interface OwnProps {
   dashboard: DashboardModel;
   sourcePanel: PanelModel;
-  sectionNav?: NavModel;
-  pageNav?: NavModelItem;
+  sectionNav: NavModel;
+  pageNav: NavModelItem;
   className?: string;
   tab?: string;
-  flag: boolean;
 }
 
 const mapStateToProps = (state: StoreState, ownProps: OwnProps) => {
@@ -240,60 +239,6 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
         </div>
       </div>
     );
-  }
-
-  MyrenderPanel(styles: EditorStyles, isOnlyPanel: boolean) {
-    const { dashboard, panel, uiState, tableViewEnabled, theme } = this.props;
-
-    return (
-      <div className={styles.mainPaneWrapper} key="panel">
-        <div className={styles.panelWrapper}>
-          <AutoSizer>
-            {({ width, height }) => {
-              if (width < 3 || height < 3) {
-                return null;
-              }
-              // If no tabs limit height so panel does not extend to edge
-              if (isOnlyPanel) {
-                height -= theme.spacing.gridSize * 2;
-              }
-
-              if (tableViewEnabled) {
-                return <PanelEditorTableView width={width} height={height} panel={panel} dashboard={dashboard} />;
-              }
-
-              const panelSize = calculatePanelSize(uiState.mode, width, height, panel);
-
-              return (
-                <div className={styles.centeringContainer} style={{ width, height }}>
-                  <div style={panelSize} data-panelid={panel.id}>
-                    <MyDashboardPanel
-                      key={panel.key}
-                      stateKey={panel.key}
-                      dashboard={dashboard}
-                      panel={panel}
-                      isEditing={true}
-                      isViewing={false}
-                      lazy={false}
-                      width={panelSize.width}
-                      height={panelSize.height}
-                    />
-                  </div>
-                </div>
-              );
-            }}
-          </AutoSizer>
-        </div>
-      </div>
-    );
-  }
-
-  renderPanelEmbed(uiState: PanelEditorUIState, styles: EditorStyles) {
-    const { plugin, tab } = this.props;
-    const tabs = getPanelEditorTabs(tab, plugin);
-    const isOnlyPanel = tabs.length === 0;
-    const panelPane = this.MyrenderPanel(styles, isOnlyPanel);
-    return <div className={styles.onlyPanel}>{panelPane}</div>;
   }
 
   renderPanelAndEditor(uiState: PanelEditorUIState, styles: EditorStyles) {
@@ -486,7 +431,7 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
   };
 
   render() {
-    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState, flag } = this.props;
+    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState } = this.props;
     const styles = getStyles(theme, this.props);
 
     if (!initDone) {
@@ -494,7 +439,7 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
     }
 
     return (<>
-      {!flag && <Page
+      <Page
         navModel={sectionNav}
         pageNav={pageNav}
         aria-label={selectors.components.PanelEditor.General.content}
@@ -535,8 +480,7 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
             />
           )}
         </div>
-      </Page>}
-      {flag && this.renderPanelEmbed(uiState, styles)}
+      </Page>
     </>
     );
   }
