@@ -96,11 +96,6 @@ export class MySoloPanelPage extends Component<Props, State> {
   }
 
   render() {
-    console.log(this.props.dashboard);
-    console.log(this.state.notFound);
-    console.log(this.state.panel);
-    console.log(this.props.queryParams);
-    console.log(this.getPanelId());
     return (
       <MySoloPanel
         dashboard={this.props.dashboard}
@@ -120,23 +115,7 @@ export interface MySoloPanelProps extends State {
 }
 
 export const MySoloPanel = ({ dashboard, notFound, panel, panelId, timezone }: MySoloPanelProps) => {
- /* useEffect(() => {
-    const receiveMessage = (event: any) => {
-      if (event.origin === 'http://localhost:8080') {
-        const nextRange = {
-          from: 'now-' + event.data,
-          to: 'now',
-        };
-        getTimeSrv().setTime(nextRange);
-      }
-    };
 
-    window.addEventListener('message', receiveMessage);
-
-    return () => {
-      window.removeEventListener('message', receiveMessage);
-    };
-  }, []); // Assicurati di passare un array vuoto come dipendenza per assicurarti che questo effetto venga eseguito solo una volta */
   if (notFound) {
     return <div className="alert alert-error">Panel with id {panelId} not found</div>;
   }
