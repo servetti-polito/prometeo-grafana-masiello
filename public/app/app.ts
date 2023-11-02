@@ -232,7 +232,6 @@ export class GrafanaApp {
       };
 
       const receiveMessage = (event: any) => {
-        console.log('riga 236 app.tsx');
         if (event.origin === 'http://localhost:8080') {
           const nextRange = {
             from: 'now-' + event.data,
