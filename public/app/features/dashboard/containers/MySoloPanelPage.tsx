@@ -55,19 +55,6 @@ export class MySoloPanelPage extends Component<Props, State> {
       fixUrl: false,
       keybindingSrv: this.context.keybindings,
     });
-
-    const receiveMessage = (event: any) => {
-      console.log('riga 61 MySoloPanelPage.tsx');
-      if (event.origin === 'http://localhost:8080') {
-        const nextRange = {
-          from: 'now-' + event.data,
-          to: 'now',
-        };
-        getTimeSrv().setTime(nextRange);
-      }
-    };
-
-    window.addEventListener('message', receiveMessage);
   }
 
   getPanelId(): number {

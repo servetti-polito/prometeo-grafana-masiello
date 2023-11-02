@@ -231,6 +231,19 @@ export class GrafanaApp {
         config,
       };
 
+      const receiveMessage = (event: any) => {
+        console.log('riga 236 app.tsx');
+        if (event.origin === 'http://localhost:8080') {
+          const nextRange = {
+            from: 'now-' + event.data,
+            to: 'now',
+          };
+          getTimeSrv().setTime(nextRange);
+        }
+      };
+  
+      window.addEventListener('message', receiveMessage);
+
       const root = createRoot(document.getElementById('reactRoot')!);
       root.render(
         React.createElement(AppWrapper, {
