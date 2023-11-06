@@ -9,7 +9,6 @@ import { StoreState } from 'app/types';
 
 import { MyDashboardPanel } from '../dashgrid/MyDashboardPanel';
 import { initDashboard } from '../state/initDashboard';
-import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 
 export interface DashboardPageRouteParams {
   uid?: string;
