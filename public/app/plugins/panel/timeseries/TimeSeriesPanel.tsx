@@ -16,7 +16,7 @@ import { ThresholdControlsPlugin } from './plugins/ThresholdControlsPlugin';
 import { getPrepareTimeseriesSuggestion } from './suggestions';
 import { getTimezones, prepareGraphableFields, regenerateLinksSupplier } from './utils';
 
-interface TimeSeriesPanelProps extends PanelProps<Options> {}
+interface TimeSeriesPanelProps extends PanelProps<Options> { }
 
 export const TimeSeriesPanel = ({
   data,
@@ -62,7 +62,8 @@ export const TimeSeriesPanel = ({
 
   const enableAnnotationCreation = Boolean(canAddAnnotations && canAddAnnotations());
 
-  return <TimeSeries
+  return (
+    <TimeSeries
       frames={frames}
       structureRev={data.structureRev}
       timeRange={timeRange}
@@ -164,5 +165,6 @@ export const TimeSeriesPanel = ({
           </>
         );
       }}
-    </TimeSeries>;
-}
+    </TimeSeries>
+  );
+};

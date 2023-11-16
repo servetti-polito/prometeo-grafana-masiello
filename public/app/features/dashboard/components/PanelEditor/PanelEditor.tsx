@@ -437,7 +437,7 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
       return null;
     }
 
-    return (<>
+    return (
       <Page
         navModel={sectionNav}
         pageNav={pageNav}
@@ -480,7 +480,6 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
           )}
         </div>
       </Page>
-    </>
     );
   }
 }
