@@ -231,17 +231,6 @@ export class GrafanaApp {
         config,
       };
 
-      const receiveMessage = (event: any) => {
-        if (event.origin === 'http://localhost:8080') {
-          const nextRange = {
-            from: 'now-' + event.data,
-            to: 'now',
-          };
-          getTimeSrv().setTime(nextRange);
-        }
-      };
-  
-      window.addEventListener('message', receiveMessage);
 
       const root = createRoot(document.getElementById('reactRoot')!);
       root.render(

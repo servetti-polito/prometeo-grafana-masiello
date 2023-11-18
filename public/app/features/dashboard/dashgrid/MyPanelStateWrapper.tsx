@@ -201,6 +201,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
 
     // Move snapshot data into the query response
     if (this.hasPanelSnapshot) {
+      console.log('ARRIVIAMO QUI RIGA 204 MyPanelStateWrapper.tsx');
       this.setState({
         data: loadSnapshotData(panel, dashboard),
         isFirstLoad: false,
@@ -244,7 +245,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { isInView, width } = this.props;
+    const { isInView, width, dashboard, panel } = this.props;
     const { context } = this.state;
 
     const app = this.getPanelContextApp();
@@ -271,6 +272,10 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     // The timer depends on panel width
     if (width !== prevProps.width) {
       liveTimer.updateInterval(this);
+    }
+
+    if (!prevProps.dashboard || prevProps.dashboard !== dashboard) {
+      console.log('ARRIVIAMO QUI', dashboard.panels[panel.id].replaceVariables());
     }
   }
 

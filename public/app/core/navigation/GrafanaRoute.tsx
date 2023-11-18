@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useLayoutEffect } from 'react';
+import React, { Suspense, useEffect, useLayoutEffect, useState } from 'react';
 // @ts-ignore
 import Drop from 'tether-drop';
 
@@ -11,12 +11,34 @@ import { GrafanaRouteError } from './GrafanaRouteError';
 import { GrafanaRouteLoading } from './GrafanaRouteLoading';
 import { GrafanaRouteComponentProps, RouteDescriptor } from './types';
 
-export interface Props extends Omit<GrafanaRouteComponentProps, 'queryParams'> {}
+export interface Props extends Omit<GrafanaRouteComponentProps, 'queryParams'> { }
 
-export function GrafanaRoute(props: Props) {
+export function GrafanaRoute(propsTmp: Props) {
   const { chrome, keybindings } = useGrafana();
+  const [props, setProps] = useState(propsTmp);
 
   chrome.setMatchedRoute(props.route);
+
+  useEffect(() => {
+    const receiveMessage = (event: any) => {
+      if (event.origin === 'http://localhost:8080') {
+        const params = locationSearchToObject(props.location.search);
+        let search = `orgId=${params.orgId}&panelId=${params.panelId}`;
+        const change = event.data;
+        const param = Object.keys(change);
+        for (let i = 0; i < param.length; i++) {
+          search += `&${param}=${change[param[i]]}`;
+        }
+        setProps((p) => ({ ...p, location: { ...p.location, search: search } }));
+      }
+    };
+
+    window.addEventListener('message', receiveMessage);
+
+    return () => {
+      window.removeEventListener('message', receiveMessage);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     keybindings.clearAndInitGlobalBindings(props.route);

@@ -61,7 +61,7 @@ export class MySoloPanelPage extends Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { dashboard } = this.props;
+    const { dashboard, queryParams, match, route } = this.props;
 
     if (!dashboard) {
       return;
@@ -77,6 +77,17 @@ export class MySoloPanelPage extends Component<Props, State> {
       }
 
       this.setState({ panel });
+    }
+
+    if (!prevProps.queryParams || prevProps.queryParams !== queryParams) {
+      this.props.initDashboard({
+        urlSlug: match.params.slug,
+        urlUid: match.params.uid,
+        urlType: match.params.type,
+        routeName: route.routeName,
+        fixUrl: false,
+        keybindingSrv: this.context.keybindings,
+      });
     }
   }
 
@@ -100,7 +111,6 @@ export interface MySoloPanelProps extends State {
 }
 
 export const MySoloPanel = ({ dashboard, notFound, panel, panelId, timezone }: MySoloPanelProps) => {
-
   if (notFound) {
     return <div className="alert alert-error">Panel with id {panelId} not found</div>;
   }
