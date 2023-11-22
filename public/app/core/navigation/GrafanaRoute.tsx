@@ -13,23 +13,16 @@ import { GrafanaRouteComponentProps, RouteDescriptor } from './types';
 
 export interface Props extends Omit<GrafanaRouteComponentProps, 'queryParams'> { }
 
-export function GrafanaRoute(propsTmp: Props) {
+export function GrafanaRoute(props: Props) {
   const { chrome, keybindings } = useGrafana();
-  const [props, setProps] = useState(propsTmp);
+  const [change, setChange] = useState({});
 
   chrome.setMatchedRoute(props.route);
 
-  useEffect(() => {
+ /* useEffect(() => {
     const receiveMessage = (event: any) => {
       if (event.origin === 'http://localhost:8080') {
-        const params = locationSearchToObject(props.location.search);
-        let search = `orgId=${params.orgId}&panelId=${params.panelId}`;
-        const change = event.data;
-        const param = Object.keys(change);
-        for (let i = 0; i < param.length; i++) {
-          search += `&${param}=${change[param[i]]}`;
-        }
-        setProps((p) => ({ ...p, location: { ...p.location, search: search } }));
+        setChange(event.data);
       }
     };
 
@@ -38,7 +31,7 @@ export function GrafanaRoute(propsTmp: Props) {
     return () => {
       window.removeEventListener('message', receiveMessage);
     };
-  }, []);
+  }, []); */
 
   useLayoutEffect(() => {
     keybindings.clearAndInitGlobalBindings(props.route);
@@ -74,7 +67,7 @@ export function GrafanaRoute(propsTmp: Props) {
 
         return (
           <Suspense fallback={<GrafanaRouteLoading />}>
-            <props.route.component {...props} queryParams={locationSearchToObject(props.location.search)} />
+            <props.route.component {...props} queryParams={locationSearchToObject(props.location.search)} change={change} />
           </Suspense>
         );
       }}

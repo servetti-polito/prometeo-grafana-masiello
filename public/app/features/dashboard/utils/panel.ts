@@ -117,22 +117,27 @@ export function applyPanelTimeOverrides(panel: PanelModel, timeRange: TimeRange)
     timeRange: timeRange,
   };
 
+  // Qui entra
   if (panel.timeFrom) {
+    // Questa funzione cambia ts in 3h
     const timeFromInterpolated = getTemplateSrv().replace(panel.timeFrom, panel.scopedVars);
+    // Questa funzione crea un oggetto con from,to e display: 'Last x hours'
     const timeFromInfo = rangeUtil.describeTextRange(timeFromInterpolated);
     if (timeFromInfo.invalid) {
       newTimeData.timeInfo = 'invalid time override';
       return newTimeData;
     }
 
+    // Qui entra
     if (_isString(timeRange.raw.from)) {
       const fromTimezone = dateTimeAsMoment(timeRange.from).tz();
       const toTimezone = dateTimeAsMoment(timeRange.to).tz();
       const timeFromDate = dateMath.parse(timeFromInfo.from, undefined, fromTimezone)!;
+      const timeToDate = dateMath.parse(timeFromInfo.to, undefined, toTimezone)!;
       newTimeData.timeInfo = timeFromInfo.display;
       newTimeData.timeRange = {
         from: timeFromDate,
-        to: dateMath.parse(timeFromInfo.to, undefined, toTimezone)!,
+        to: timeToDate,
         raw: {
           from: timeFromInfo.from,
           to: timeFromInfo.to,
@@ -141,6 +146,7 @@ export function applyPanelTimeOverrides(panel: PanelModel, timeRange: TimeRange)
     }
   }
 
+  // Qui non entra
   if (panel.timeShift) {
     const timeShiftInterpolated = getTemplateSrv().replace(panel.timeShift, panel.scopedVars);
     const timeShiftInfo = rangeUtil.describeTextRange(timeShiftInterpolated);
@@ -164,6 +170,7 @@ export function applyPanelTimeOverrides(panel: PanelModel, timeRange: TimeRange)
     };
   }
 
+  //Qui entra se nascondo il time in alto a sinistra
   if (panel.hideTimeOverride) {
     newTimeData.timeInfo = '';
   }

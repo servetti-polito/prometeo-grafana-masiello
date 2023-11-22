@@ -19,8 +19,9 @@ import {
   TimeRange,
   toDataFrameDTO,
   toUtc,
+  TypedVariableModel,
 } from '@grafana/data';
-import { RefreshEvent } from '@grafana/runtime';
+import { RefreshEvent, getTemplateSrv } from '@grafana/runtime';
 import { VizLegendOptions } from '@grafana/schema';
 import {
   ErrorBoundary,
@@ -200,8 +201,8 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     dashboard.panelInitialized(this.props.panel);
 
     // Move snapshot data into the query response
+    //Qui non entra
     if (this.hasPanelSnapshot) {
-      console.log('ARRIVIAMO QUI RIGA 204 MyPanelStateWrapper.tsx');
       this.setState({
         data: loadSnapshotData(panel, dashboard),
         isFirstLoad: false,
@@ -209,6 +210,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
       return;
     }
 
+    // Qui non entra
     if (!this.wantsQueryExecution) {
       this.setState({ isFirstLoad: false });
     }
@@ -224,6 +226,34 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
 
     // Listen for live timer events
     liveTimer.listen(this);
+
+    const receiveMessage = (event: any) => {
+      const change = event.data;
+      const srv = getTemplateSrv();
+      const variables = srv.getVariables();
+      const newVariables: TypedVariableModel[] = [];
+      let tmp: TypedVariableModel;
+      let newV: TypedVariableModel;
+      change.forEach((c) => {
+        tmp = variables.find((v) => v.name === c.key);
+        if (tmp) {
+          newV = { ...tmp };
+          newV.current = { ...tmp.current, value: c.value };
+          newVariables.push(newV);
+        }
+      });
+      if (newVariables.length > 0) {
+        srv.init(newVariables);
+        this.onRefresh();
+      }
+    };
+
+    window.addEventListener('message', receiveMessage);
+
+    return () => {
+      window.removeEventListener('message', receiveMessage);
+    };
+
   }
 
   componentWillUnmount() {
@@ -245,7 +275,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { isInView, width, dashboard, panel } = this.props;
+    const { isInView, width, dashboard } = this.props;
     const { context } = this.state;
 
     const app = this.getPanelContextApp();
@@ -275,7 +305,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     }
 
     if (!prevProps.dashboard || prevProps.dashboard !== dashboard) {
-      console.log('ARRIVIAMO QUI', dashboard.panels[panel.id].replaceVariables());
+      this.onRefresh();
     }
   }
 
@@ -332,14 +362,14 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
 
   onRefresh = () => {
     const { dashboard, panel, isInView, width } = this.props;
-
     if (!isInView) {
       this.setState({ refreshWhenInView: true });
       return;
     }
 
+    //Qui è ancora 6h
     const timeData = applyPanelTimeOverrides(panel, this.timeSrv.timeRange());
-
+    //Qui diventa 3h
     // Issue Query
     if (this.wantsQueryExecution) {
       if (width < 0) {

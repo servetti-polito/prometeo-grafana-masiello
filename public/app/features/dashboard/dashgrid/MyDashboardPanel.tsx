@@ -86,6 +86,7 @@ export class MyDashboardPanelUnconnected extends PureComponent<Props> {
       isDraggable = true,
     } = this.props;
 
+    //Qui è ancora 6h
     if (!plugin) {
       return null;
     }
@@ -121,7 +122,7 @@ export class MyDashboardPanelUnconnected extends PureComponent<Props> {
         timezone={timezone}
         hideMenu={hideMenu}
       />
-    ); 
+    );
   };
 
   render() {

@@ -9,6 +9,7 @@ import { StoreState } from 'app/types';
 
 import { MyDashboardPanel } from '../dashgrid/MyDashboardPanel';
 import { initDashboard } from '../state/initDashboard';
+import { getTemplateSrv } from '@grafana/runtime';
 
 export interface DashboardPageRouteParams {
   uid?: string;
@@ -26,7 +27,7 @@ const mapDispatchToProps = {
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-export type Props = GrafanaRouteComponentProps<DashboardPageRouteParams, { panelId: string; timezone?: string }> &
+export type Props = GrafanaRouteComponentProps<DashboardPageRouteParams, { panelId: string; timezone?: string, change: [] }> &
   ConnectedProps<typeof connector>;
 
 export interface State {
@@ -61,7 +62,7 @@ export class MySoloPanelPage extends Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { dashboard, queryParams, match, route } = this.props;
+    const { dashboard, match, route, change } = this.props;
 
     if (!dashboard) {
       return;
@@ -79,7 +80,11 @@ export class MySoloPanelPage extends Component<Props, State> {
       this.setState({ panel });
     }
 
-    if (!prevProps.queryParams || prevProps.queryParams !== queryParams) {
+    if (!prevProps.change || prevProps.change !== change) {
+      const srv = getTemplateSrv();
+      change.forEach((c: any) => {
+        srv.updateVariable(c.key, c.value);
+      });
       this.props.initDashboard({
         urlSlug: match.params.slug,
         urlUid: match.params.uid,
@@ -111,6 +116,7 @@ export interface MySoloPanelProps extends State {
 }
 
 export const MySoloPanel = ({ dashboard, notFound, panel, panelId, timezone }: MySoloPanelProps) => {
+  //Qui ho ancora 6h come timeRange
   if (notFound) {
     return <div className="alert alert-error">Panel with id {panelId} not found</div>;
   }
