@@ -236,7 +236,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
       let newV: TypedVariableModel;
       change.forEach((c) => {
         tmp = variables.find((v) => v.name === c.key);
-        if (tmp) {
+        if (tmp != undefined) {
           newV = { ...tmp };
           newV.current = { ...tmp.current, value: c.value };
           newVariables.push(newV);
