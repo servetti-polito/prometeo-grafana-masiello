@@ -9,7 +9,6 @@ import { StoreState } from 'app/types';
 
 import { MyDashboardPanel } from '../dashgrid/MyDashboardPanel';
 import { initDashboard } from '../state/initDashboard';
-import { getTemplateSrv } from '@grafana/runtime';
 
 export interface DashboardPageRouteParams {
   uid?: string;
@@ -27,7 +26,7 @@ const mapDispatchToProps = {
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-export type Props = GrafanaRouteComponentProps<DashboardPageRouteParams, { panelId: string; timezone?: string, change: [] }> &
+export type Props = GrafanaRouteComponentProps<DashboardPageRouteParams, { panelId: string; timezone?: string }> &
   ConnectedProps<typeof connector>;
 
 export interface State {
@@ -62,7 +61,7 @@ export class MySoloPanelPage extends Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { dashboard, match, route, change } = this.props;
+    const { dashboard, queryParams } = this.props;
 
     if (!dashboard) {
       return;
@@ -80,19 +79,13 @@ export class MySoloPanelPage extends Component<Props, State> {
       this.setState({ panel });
     }
 
-    if (!prevProps.change || prevProps.change !== change) {
-      const srv = getTemplateSrv();
-      change.forEach((c: any) => {
-        srv.updateVariable(c.key, c.value);
-      });
-      this.props.initDashboard({
-        urlSlug: match.params.slug,
-        urlUid: match.params.uid,
-        urlType: match.params.type,
-        routeName: route.routeName,
-        fixUrl: false,
-        keybindingSrv: this.context.keybindings,
-      });
+    if (!prevProps.queryParams || prevProps.queryParams !== queryParams) {
+      const panel = dashboard.getPanelByUrlId(this.props.queryParams.panelId);
+      if (!panel) {
+        this.setState({ notFound: true });
+        return;
+      }
+      this.setState({ panel: panel, notFound: false });
     }
   }
 

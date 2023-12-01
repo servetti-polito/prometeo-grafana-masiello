@@ -350,29 +350,6 @@ export class TemplateSrv implements BaseTemplateSrv {
   private getAdHocVariables(): AdHocVariableModel[] {
     return this.dependencies.getFilteredVariables(isAdHoc) as AdHocVariableModel[];
   }
-
-
-  updateVariable(variableName: string, value: string) {
-    let tmp: TypedVariableModel;
-    let variableToUpdate: TypedVariableModel | undefined;
-    // let found = false;
-    tmp = (this.getVariables() as any).find((v) => { v.name == variableName });
-    if (tmp !== undefined) {
-      variableToUpdate = { ...tmp };
-      variableToUpdate.current = { ...tmp.current, value: value, text: value };
-    }
-    /* this.getVariables().forEach((v) => {
-       if (v.name == variableName && !found) {
-         variableToUpdate = { ...v };
-         variableToUpdate.current = { ...v.current, value: value };
-         found = true;
-       }
-     }); */
-    if (variableToUpdate !== undefined) {
-      this._variables.push(variableToUpdate);
-      this.updateIndex();
-    }
-  }
 }
 
 // Expose the template srv

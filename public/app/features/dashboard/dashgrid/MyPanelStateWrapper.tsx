@@ -191,7 +191,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     };
   }
 
-  componentDidMount() {
+  initializePanel() {
     const { panel, dashboard } = this.props;
 
     // Subscribe to panel events
@@ -226,9 +226,14 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
 
     // Listen for live timer events
     liveTimer.listen(this);
+  }
+
+  componentDidMount() {
+    this.initializePanel();
 
     const receiveMessage = (event: any) => {
-      const change = event.data;
+      if (event.data.variables == undefined) return;
+      const change = event.data.variables;
       const srv = getTemplateSrv();
       const variables = srv.getVariables();
       const newVariables: TypedVariableModel[] = [];
@@ -275,7 +280,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { isInView, width, dashboard } = this.props;
+    const { isInView, width, panel } = this.props;
     const { context } = this.state;
 
     const app = this.getPanelContextApp();
@@ -304,8 +309,10 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
       liveTimer.updateInterval(this);
     }
 
-    if (!prevProps.dashboard || prevProps.dashboard !== dashboard) {
-      this.onRefresh();
+    if (!prevProps.panel || prevProps.panel.id !== panel.id) {
+      this.subs.unsubscribe();
+      liveTimer.remove(this);
+      this.initializePanel();
     }
   }
 
