@@ -72,7 +72,7 @@ export class MyDashboardPanelUnconnected extends PureComponent<Props> {
     }
   };
 
-  renderPanel = ({ isInView }: { isInView: boolean }) => {
+ /* renderPanel = ({ panelId }: { panelId: number }) => {
     const {
       dashboard,
       panel,
@@ -91,20 +91,42 @@ export class MyDashboardPanelUnconnected extends PureComponent<Props> {
       return null;
     }
 
-    if (plugin && plugin.angularPanelCtrl) {
-      return (
-        <PanelChromeAngular
-          plugin={plugin}
-          panel={panel}
-          dashboard={dashboard}
-          isViewing={isViewing}
-          isEditing={isEditing}
-          isInView={isInView}
-          isDraggable={isDraggable}
-          width={width}
-          height={height}
-        />
-      );
+    return (
+      <MyPanelStateWrapper
+        panelId={panelId}
+        plugin={plugin}
+        panel={panel}
+        dashboard={dashboard}
+        isViewing={isViewing}
+        isEditing={isEditing}
+        isInView={true}
+        isDraggable={isDraggable}
+        width={width}
+        height={height}
+        onInstanceStateChange={this.onInstanceStateChange}
+        timezone={timezone}
+        hideMenu={hideMenu}
+      />
+    );
+  }; */
+
+  render() {
+    const {
+      dashboard,
+      panel,
+      isViewing,
+      isEditing,
+      width,
+      height,
+      plugin,
+      timezone,
+      hideMenu,
+      isDraggable = true,
+    } = this.props;
+
+    //Qui è ancora 6h
+    if (!plugin) {
+      return null;
     }
 
     return (
@@ -114,7 +136,7 @@ export class MyDashboardPanelUnconnected extends PureComponent<Props> {
         dashboard={dashboard}
         isViewing={isViewing}
         isEditing={isEditing}
-        isInView={isInView}
+        isInView={true}
         isDraggable={isDraggable}
         width={width}
         height={height}
@@ -122,18 +144,6 @@ export class MyDashboardPanelUnconnected extends PureComponent<Props> {
         timezone={timezone}
         hideMenu={hideMenu}
       />
-    );
-  };
-
-  render() {
-    const { width, height, lazy } = this.props;
-
-    return lazy ? (
-      <LazyLoader width={width} height={height} onChange={this.onVisibilityChange} onLoad={this.onPanelLoad}>
-        {this.renderPanel}
-      </LazyLoader>
-    ) : (
-      this.renderPanel({ isInView: true })
     );
   }
 }

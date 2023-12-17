@@ -23,7 +23,7 @@ export function GrafanaRoute(props: Props) {
 
   chrome.setMatchedRoute(props.route);
 
-  useEffect(() => {
+/*  useEffect(() => {
     const receiveMessage = (event: any) => {
       if (event.data.panelId == undefined) return;
       setQueryParams((qp) => ({ ...qp, panelId: event.data.panelId }));
@@ -34,7 +34,7 @@ export function GrafanaRoute(props: Props) {
     return () => {
       window.removeEventListener('message', receiveMessage);
     };
-  }, []);
+  }, []); */
 
   useLayoutEffect(() => {
     keybindings.clearAndInitGlobalBindings(props.route);
