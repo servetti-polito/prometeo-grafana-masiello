@@ -78,6 +78,7 @@ export interface State {
   liveTime?: TimeRange;
   panel: PanelModel;
   notFound: boolean;
+  panelId: number;
 }
 
 export class MyPanelStateWrapper extends PureComponent<Props, State> {
@@ -262,7 +263,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
       if (event.data.panelId != undefined) {
         const panel = dashboard.getPanelByUrlId(event.data.panelId);
         if (!panel) {
-          this.setState({ notFound: true });
+          this.setState({ notFound: true, panelId: event.data.panelId });
           return;
         }
         console.log('riga 263 MyPanelStateWrapper.tsx', panel.id, panel.title);
@@ -583,7 +584,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
 
   render() {
     const { dashboard, width, height, plugin } = this.props;
-    const { errorMessage, data, panel, notFound } = this.state;
+    const { errorMessage, data, panel, notFound, panelId } = this.state;
     const { transparent } = panel;
 
     const MypanelChromeProps = getPanelChromeProps({ ...this.props, data, panel });
@@ -598,7 +599,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     );
 
     if (notFound) {
-      return <div className="alert alert-error">Panel with id {panel.id} not found</div>;
+      return <div className="alert alert-error">Panel with id {panelId} not found</div>;
     }
 
     // Questo è il componente che contiene il grafico
