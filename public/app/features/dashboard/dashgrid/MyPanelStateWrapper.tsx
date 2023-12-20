@@ -76,8 +76,11 @@ export interface State {
   context: PanelContext;
   data: PanelData;
   liveTime?: TimeRange;
+  //Aggiunto per la modifica del panel id usando la postMessage in componentDidMount
   panel: PanelModel;
+  //Aggiunto per la gestione del panel not found
   notFound: boolean;
+  // Aggiunto per segnalare il corretto panel id in caso di panel not found 
   panelId: number;
 }
 
@@ -587,6 +590,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     const { errorMessage, data, panel, notFound, panelId } = this.state;
     const { transparent } = panel;
 
+    // Aggiunto panel perché deve usare quello preso dallo stato e non dalle props
     const MypanelChromeProps = getPanelChromeProps({ ...this.props, data, panel });
 
     // Shift the hover menu down if it's on the top row so it doesn't get clipped by topnav
