@@ -25,7 +25,7 @@ import { RefreshEvent, getTemplateSrv } from '@grafana/runtime';
 import { VizLegendOptions } from '@grafana/schema';
 import {
   ErrorBoundary,
-  MyPanelChrome,
+  PanelChrome,
   PanelContext,
   PanelContextProvider,
   SeriesVisibilityChangeMode,
@@ -240,7 +240,6 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   componentDidMount() {
     const { dashboard } = this.props;
     this.initializePanel();
-    console.log('riga 234 MyPanelStateWrapper.tsx', this.state.panel.id, this.state.panel.title);
 
     const receiveMessage = (event: any) => {
       if (event.data.variables != undefined) {
@@ -269,7 +268,6 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
           this.setState({ notFound: true, panelId: event.data.panelId });
           return;
         }
-        console.log('riga 263 MyPanelStateWrapper.tsx', panel.id, panel.title);
         this.setState({ panel: panel, notFound: false });
       }
     };
@@ -283,7 +281,6 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   componentWillUnmount() {
-    console.log('riga 267 MyPanelStateWrapper.tsx', this.state.panel.id, this.state.panel.title);
     this.subs.unsubscribe();
     liveTimer.remove(this);
   }
@@ -304,7 +301,6 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   componentDidUpdate(prevProps: Props, prevState: State) {
     const { isInView, width } = this.props;
     const { context, panel } = this.state;
-    console.log('riga 301 MyPanelStateWrapper.tsx', panel.id, panel.title);
 
     const app = this.getPanelContextApp();
 
@@ -333,7 +329,6 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     }
 
     if (!prevState.panel || prevState.panel.id !== panel.id) {
-      console.log('riga 330 MyPanelStateWrapper.tsx', panel.id, panel.title);
       this.initializePanel();
       this.onRefresh();
     }
@@ -591,7 +586,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     const { transparent } = panel;
 
     // Aggiunto panel perché deve usare quello preso dallo stato e non dalle props
-    const MypanelChromeProps = getPanelChromeProps({ ...this.props, data, panel });
+    const panelChromeProps = getPanelChromeProps({ ...this.props, data, panel });
 
     // Shift the hover menu down if it's on the top row so it doesn't get clipped by topnav
     const hoverHeaderOffset = (panel.gridPos?.y ?? 0) === 0 ? -16 : undefined;
@@ -608,24 +603,24 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
 
     // Questo è il componente che contiene il grafico
     return (
-      <MyPanelChrome
+      <PanelChrome
         width={width}
         height={height}
-        title={MypanelChromeProps.title}
+        title={panelChromeProps.title}
         loadingState={data.state}
         statusMessage={errorMessage}
-        statusMessageOnClick={MypanelChromeProps.onOpenErrorInspect}
-        description={MypanelChromeProps.description}
-        titleItems={MypanelChromeProps.titleItems}
+        statusMessageOnClick={panelChromeProps.onOpenErrorInspect}
+        description={panelChromeProps.description}
+        titleItems={panelChromeProps.titleItems}
         menu={this.props.hideMenu ? undefined : menu}
-        dragClass={MypanelChromeProps.dragClass}
+        dragClass={panelChromeProps.dragClass}
         dragClassCancel="grid-drag-cancel"
-        padding={MypanelChromeProps.padding}
+        padding={panelChromeProps.padding}
         hoverHeaderOffset={hoverHeaderOffset}
-        hoverHeader={MypanelChromeProps.hasOverlayHeader()}
+        hoverHeader={panelChromeProps.hasOverlayHeader()}
         displayMode={transparent ? 'transparent' : 'default'}
-        onCancelQuery={MypanelChromeProps.onCancelQuery}
-        onOpenMenu={MypanelChromeProps.onOpenMenu}
+        onCancelQuery={panelChromeProps.onCancelQuery}
+        onOpenMenu={panelChromeProps.onOpenMenu}
       >
         {(innerWidth, innerHeight) => (
           <>
@@ -643,7 +638,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
             </ErrorBoundary>
           </>
         )}
-      </MyPanelChrome>
+      </PanelChrome>
     );
   }
 }

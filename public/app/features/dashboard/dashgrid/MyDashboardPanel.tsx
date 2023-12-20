@@ -7,8 +7,7 @@ import { initPanelState } from '../../panel/state/actions';
 import { setPanelInstanceState } from '../../panel/state/reducers';
 import { DashboardModel, PanelModel } from '../state';
 
-import { LazyLoader } from './LazyLoader';
-import { PanelChromeAngular } from './PanelChromeAngular';
+
 import { MyPanelStateWrapper } from './MyPanelStateWrapper';
 
 export interface OwnProps {
@@ -72,43 +71,6 @@ export class MyDashboardPanelUnconnected extends PureComponent<Props> {
     }
   };
 
- /* renderPanel = ({ panelId }: { panelId: number }) => {
-    const {
-      dashboard,
-      panel,
-      isViewing,
-      isEditing,
-      width,
-      height,
-      plugin,
-      timezone,
-      hideMenu,
-      isDraggable = true,
-    } = this.props;
-
-    //Qui è ancora 6h
-    if (!plugin) {
-      return null;
-    }
-
-    return (
-      <MyPanelStateWrapper
-        panelId={panelId}
-        plugin={plugin}
-        panel={panel}
-        dashboard={dashboard}
-        isViewing={isViewing}
-        isEditing={isEditing}
-        isInView={true}
-        isDraggable={isDraggable}
-        width={width}
-        height={height}
-        onInstanceStateChange={this.onInstanceStateChange}
-        timezone={timezone}
-        hideMenu={hideMenu}
-      />
-    );
-  }; */
 
   render() {
     const {

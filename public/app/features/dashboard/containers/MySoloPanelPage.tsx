@@ -79,14 +79,6 @@ export class MySoloPanelPage extends Component<Props, State> {
       this.setState({ panel });
     }
 
-    if (!prevProps.queryParams || prevProps.queryParams !== queryParams) {
-      const panel = dashboard.getPanelByUrlId(this.props.queryParams.panelId);
-      if (!panel) {
-        this.setState({ notFound: true });
-        return;
-      }
-      this.setState({ panel: panel, notFound: false });
-    }
   }
 
   render() {

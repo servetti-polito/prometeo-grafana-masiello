@@ -132,10 +132,6 @@ export {
 export { VizRepeater, type VizRepeaterRenderValueProps } from './VizRepeater/VizRepeater';
 export { graphTimeFormat, graphTickFormatter } from './Graph/utils';
 export {
-  MyPanelChrome,
-  type MyPanelChromeProps,
-  type MyPanelPadding,
-  type MyPanelChromeType,
   PanelChrome,
   type PanelChromeProps,
   type PanelPadding,

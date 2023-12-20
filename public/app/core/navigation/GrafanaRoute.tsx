@@ -15,26 +15,9 @@ export interface Props extends Omit<GrafanaRouteComponentProps, 'queryParams'> {
 
 export function GrafanaRoute(props: Props) {
   const { chrome, keybindings } = useGrafana();
-  const [queryParams, setQueryParams] = useState();
 
-  useEffect(() => {
-    setQueryParams(locationSearchToObject(props.location.search));
-  }, [props.location.search]);
 
   chrome.setMatchedRoute(props.route);
-
-/*  useEffect(() => {
-    const receiveMessage = (event: any) => {
-      if (event.data.panelId == undefined) return;
-      setQueryParams((qp) => ({ ...qp, panelId: event.data.panelId }));
-    };
-
-    window.addEventListener('message', receiveMessage);
-
-    return () => {
-      window.removeEventListener('message', receiveMessage);
-    };
-  }, []); */
 
   useLayoutEffect(() => {
     keybindings.clearAndInitGlobalBindings(props.route);
@@ -70,7 +53,7 @@ export function GrafanaRoute(props: Props) {
 
         return (
           <Suspense fallback={<GrafanaRouteLoading />}>
-            <props.route.component {...props} queryParams={queryParams} />
+            <props.route.component {...props} queryParams={locationSearchToObject(props.location.search)} />
           </Suspense>
         );
       }}
