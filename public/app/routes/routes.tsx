@@ -77,7 +77,7 @@ export function getAppRoutes(): RouteDescriptor[] {
       routeName: DashboardRoutes.Normal,
       chromeless: true,
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "SoloPanelPage" */ '../features/dashboard/containers/SoloPanelPage')
+        () => import(/* webpackChunkName: "MySoloPanelPage" */ '../features/dashboard/containers/MySoloPanelPage')
       ),
     },
     //MySoloPanelPage.tsx
@@ -87,7 +87,7 @@ export function getAppRoutes(): RouteDescriptor[] {
       routeName: DashboardRoutes.Normal,
       chromeless: true,
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "MySoloPanelPage" */ '../features/dashboard/containers/MySoloPanelPage')
+        () => import(/* webpackChunkName: "SoloPanelPage" */ '../features/dashboard/containers/SoloPanelPage')
       ),
     },
     // This route handles embedding of snapshot/scripted dashboard panels

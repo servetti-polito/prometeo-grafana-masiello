@@ -262,6 +262,9 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
           this.onRefresh();
         }
       }
+      if (event.data.timeRange != undefined) {
+        this.onChangeTimeRange(event.data.timeRange);
+      }
       if (event.data.panelId != undefined) {
         const panel = dashboard.getPanelByUrlId(event.data.panelId);
         if (!panel) {
@@ -496,11 +499,14 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   onChangeTimeRange = (timeRange: AbsoluteTimeRange) => {
-    return;
     this.timeSrv.setTime({
       from: toUtc(timeRange.from),
       to: toUtc(timeRange.to),
     });
+  };
+
+  onChangeTimeRangeOverride = (timeRange: AbsoluteTimeRange) => {
+    return;
   };
 
   shouldSignalRenderingCompleted(loadingState: LoadingState, pluginMeta: PanelPluginMeta) {
@@ -572,7 +578,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
             replaceVariables={panel.replaceVariables}
             onOptionsChange={this.onOptionsChange}
             onFieldConfigChange={this.onFieldConfigChange}
-            onChangeTimeRange={this.onChangeTimeRange} // Rimossa callback per cambiare il range di tempo
+            onChangeTimeRange={this.onChangeTimeRangeOverride} // Rimossa callback per cambiare il range di tempo
             eventBus={dashboard.events}
           />
         </PanelContextProvider>
