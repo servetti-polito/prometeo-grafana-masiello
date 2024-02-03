@@ -198,7 +198,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     this.subs.add(panel.events.subscribe(RefreshEvent, this.onRefresh));
     this.subs.add(panel.events.subscribe(RenderEvent, this.onRender));
 
-    dashboard.panelInitialized(props.panel);
+    dashboard.panelInitialized(panel);
 
     // Move snapshot data into the query response
     //Qui non entra
