@@ -76,12 +76,6 @@ export interface State {
   context: PanelContext;
   data: PanelData;
   liveTime?: TimeRange;
-  //Aggiunto per la modifica del panel id usando la postMessage in componentDidMount
-  panel: PanelModel;
-  //Aggiunto per la gestione del panel not found
-  notFound: boolean;
-  // Aggiunto per segnalare il corretto panel id in caso di panel not found 
-  panelId: number;
 }
 
 export class MyPanelStateWrapper extends PureComponent<Props, State> {
@@ -118,8 +112,6 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
         onUpdateData: this.onUpdateData,
       },
       data: this.getInitialPanelDataState(),
-      panel: props.panel,
-      notFound: false,
     };
   }
 
@@ -149,21 +141,21 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   onUpdateData = (frames: DataFrame[]): Promise<boolean> => {
-    return onUpdatePanelSnapshotData(this.state.panel, frames);
+    return onUpdatePanelSnapshotData(this.props.panel, frames);
   };
 
   onSeriesColorChange = (label: string, color: string) => {
-    this.onFieldConfigChange(changeSeriesColorConfigFactory(label, color, this.state.panel.fieldConfig));
+    this.onFieldConfigChange(changeSeriesColorConfigFactory(label, color, this.props.panel.fieldConfig));
   };
 
   onSeriesVisibilityChange = (label: string, mode: SeriesVisibilityChangeMode) => {
     this.onFieldConfigChange(
-      seriesVisibilityConfigFactory(label, mode, this.state.panel.fieldConfig, this.state.data.series)
+      seriesVisibilityConfigFactory(label, mode, this.props.panel.fieldConfig, this.state.data.series)
     );
   };
 
   onToggleLegendSort = (sortKey: string) => {
-    const legendOptions: VizLegendOptions = this.state.panel.options.legend;
+    const legendOptions: VizLegendOptions = this.props.panel.options.legend;
 
     // We don't want to do anything when legend options are not available
     if (!legendOptions) {
@@ -186,7 +178,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     }
 
     this.onOptionsChange({
-      ...this.state.panel.options,
+      ...this.props.panel.options,
       legend: { ...legendOptions, sortBy, sortDesc },
     });
   };
@@ -200,14 +192,13 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   initializePanel() {
-    const { dashboard } = this.props;
-    const { panel } = this.state;
+    const { dashboard, panel } = this.props;
 
     // Subscribe to panel events
     this.subs.add(panel.events.subscribe(RefreshEvent, this.onRefresh));
     this.subs.add(panel.events.subscribe(RenderEvent, this.onRender));
 
-    dashboard.panelInitialized(this.state.panel);
+    dashboard.panelInitialized(props.panel);
 
     // Move snapshot data into the query response
     //Qui non entra
@@ -238,7 +229,6 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    const { dashboard } = this.props;
     this.initializePanel();
 
     const receiveMessage = (event: any) => {
@@ -265,14 +255,6 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
       if (event.data.timeRange != undefined) {
         this.onChangeTimeRange(event.data.timeRange);
       }
-      if (event.data.panelId != undefined) {
-        const panel = dashboard.getPanelByUrlId(event.data.panelId);
-        if (!panel) {
-          this.setState({ notFound: true, panelId: event.data.panelId });
-          return;
-        }
-        this.setState({ panel: panel, notFound: false });
-      }
     };
 
     window.addEventListener('message', receiveMessage);
@@ -294,7 +276,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
       const delta = liveTime.to.valueOf() - data.timeRange.to.valueOf();
       if (delta < 100) {
         // 10hz
-        console.log('Skip tick render', this.state.panel.title, delta);
+        console.log('Skip tick render', this.props.panel.title, delta);
         return;
       }
     }
@@ -302,8 +284,8 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    const { isInView, width } = this.props;
-    const { context, panel } = this.state;
+    const { isInView, width, panel } = this.props;
+    const { context } = this.state;
 
     const app = this.getPanelContextApp();
 
@@ -331,18 +313,13 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
       liveTimer.updateInterval(this);
     }
 
-    if (!prevState.panel || prevState.panel.id !== panel.id) {
-      this.initializePanel();
-      this.onRefresh();
-    }
   }
 
   // Updates the response with information from the stream
   // The next is outside a react synthetic event so setState is not batched
   // So in this context we can only do a single call to setState
   onDataUpdate(data: PanelData) {
-    const { dashboard, plugin } = this.props;
-    const { panel } = this.state;
+    const { dashboard, plugin, panel } = this.props;
 
     // Ignore this data update if we are now a non data panel
     if (plugin.meta.skipDataQuery) {
@@ -390,8 +367,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   onRefresh = () => {
-    const { dashboard, isInView, width } = this.props;
-    const { panel } = this.state;
+    const { dashboard, isInView, width, panel } = this.props;
     if (!isInView) {
       this.setState({ refreshWhenInView: true });
       return;
@@ -431,11 +407,11 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   };
 
   onOptionsChange = (options: any) => {
-    this.state.panel.updateOptions(options);
+    this.props.panel.updateOptions(options);
   };
 
   onFieldConfigChange = (config: FieldConfigSource) => {
-    this.state.panel.updateFieldConfig(config);
+    this.props.panel.updateFieldConfig(config);
   };
 
   onPanelError = (error: Error) => {
@@ -453,7 +429,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     const isRegion = event.from !== event.to;
     const anno = {
       dashboardUID: this.props.dashboard.uid,
-      panelId: this.state.panel.id,
+      panelId: this.props.panel.id,
       isRegion,
       time: event.from,
       timeEnd: isRegion ? event.to : 0,
@@ -476,7 +452,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
     const anno = {
       id: event.id,
       dashboardUID: this.props.dashboard.uid,
-      panelId: this.state.panel.id,
+      panelId: this.props.panel.id,
       isRegion,
       time: event.from,
       timeEnd: isRegion ? event.to : 0,
@@ -490,7 +466,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   };
 
   get hasPanelSnapshot() {
-    const { panel } = this.state;
+    const { panel } = this.props;
     return panel.snapshotData && panel.snapshotData.length;
   }
 
@@ -527,7 +503,7 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
 
     // When the datasource is null/undefined (for a default datasource), we use getInstanceSettings
     // to find the real datasource ref for the default datasource.
-    const datasourceInstance = getDatasourceSrv().getInstanceSettings(this.state.panel.datasource);
+    const datasourceInstance = getDatasourceSrv().getInstanceSettings(this.props.panel.datasource);
     const datasourceRef = datasourceInstance && getDataSourceRef(datasourceInstance);
     if (!datasourceRef) {
       return;
@@ -537,8 +513,8 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   };
 
   renderPanelContent(innerWidth: number, innerHeight: number) {
-    const { plugin, dashboard } = this.props;
-    const { renderCounter, data, panel } = this.state;
+    const { plugin, dashboard, panel } = this.props;
+    const { renderCounter, data } = this.state;
     const { state: loadingState } = data;
 
     // do not render component until we have first data
@@ -587,8 +563,8 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
   }
 
   render() {
-    const { dashboard, width, height, plugin } = this.props;
-    const { errorMessage, data, panel, notFound, panelId } = this.state;
+    const { dashboard, width, height, plugin, panel } = this.props;
+    const { errorMessage, data } = this.state;
     const { transparent } = panel;
 
     // Aggiunto panel perché deve usare quello preso dallo stato e non dalle props
@@ -602,10 +578,6 @@ export class MyPanelStateWrapper extends PureComponent<Props, State> {
         <PanelHeaderMenuWrapper panel={panel} dashboard={dashboard} loadingState={data.state} />
       </div>
     );
-
-    if (notFound) {
-      return <div className="alert alert-error">Panel with id {panelId} not found</div>;
-    }
 
     // Questo è il componente che contiene il grafico
     return (

@@ -70,13 +70,22 @@ export class MySoloPanelPage extends Component<Props, State> {
     // we just got a new dashboard
     if (!prevProps.dashboard || prevProps.dashboard.uid !== dashboard.uid) {
       const panel = dashboard.getPanelByUrlId(this.props.queryParams.panelId);
+      if (!panel) {
+        this.setState({ notFound: true });
+        return;
+      }
+      this.setState({ panel, notFound: false });
+    }
+
+    if (!prevProps.queryParams || prevProps.queryParams.panelId !== queryParams.panelId) {
+      const panel = dashboard.getPanelByUrlId(this.getPanelId());
 
       if (!panel) {
         this.setState({ notFound: true });
         return;
       }
 
-      this.setState({ panel });
+      this.setState({ panel, notFound: false });
     }
 
   }
