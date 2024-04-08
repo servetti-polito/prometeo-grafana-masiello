@@ -72,6 +72,15 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
     }
   };
 
+  componentDidUpdate(prevProps: Props) {
+    const { panel } = this.props;
+    if (!prevProps.panel || prevProps.panel.id !== panel.id) {
+      this.props.panel.isInView = !this.props.lazy;
+      if (!this.props.lazy) {
+        this.onPanelLoad();
+      }    }
+  }
+
   renderPanel = ({ isInView }: { isInView: boolean }) => {
     const {
       dashboard,
