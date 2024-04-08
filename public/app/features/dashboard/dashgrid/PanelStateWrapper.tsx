@@ -191,7 +191,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     };
   }
 
-  initializePanel() {
+  componentDidMount() {
     const { dashboard, panel } = this.props;
 
     // Subscribe to panel events
@@ -224,29 +224,24 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
 
     // Listen for live timer events
     liveTimer.listen(this);
-  }
-
-  componentDidMount() {
-    this.initializePanel();
-
     const receiveMessage = (event: any) => {
       if (event.data.variables != undefined) {
-        const change = event.data.variables;
-        const srv = getTemplateSrv();
-        const variables = srv.getVariables();
-        const newVariables: TypedVariableModel[] = [];
-        let tmp: TypedVariableModel;
-        let newV: TypedVariableModel;
-        change.forEach((c) => {
-          tmp = variables.find((v) => v.name === c.key);
-          if (tmp != undefined) {
-            newV = { ...tmp };
-            newV.current = { ...tmp.current, value: c.value };
-            newVariables.push(newV);
+        const Change = event.data.variables;
+        const Srv = getTemplateSrv();
+        const Variables = srv.getVariables();
+        const NewVariables: TypedVariableModel[] = [];
+        let Tmp: TypedVariableModel;
+        let NewV: TypedVariableModel;
+        Change.forEach((c) => {
+          Tmp = Variables.find((v) => v.name === c.key);
+          if (Tmp != undefined) {
+            NewV = { ...Tmp };
+            NewV.current = { ...Tmp.current, value: c.value };
+            NewVariables.push(NewV);
           }
         });
-        if (newVariables.length > 0) {
-          srv.init(newVariables);
+        if (NewVariables.length > 0) {
+          Srv.init(NewVariables);
           this.onRefresh();
         }
       }
@@ -281,8 +276,8 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     this.setState({ liveTime });
   }
 
-  componentDidUpdate(prevProps: Props, prevState: State) {
-    const { isInView, width, panel } = this.props;
+  componentDidUpdate(prevProps: Props) {
+    const { isInView, width } = this.props;
     const { context } = this.state;
 
     const app = this.getPanelContextApp();
