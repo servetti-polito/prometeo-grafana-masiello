@@ -228,7 +228,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
       if (event.data.variables != undefined) {
         const Change = event.data.variables;
         const Srv = getTemplateSrv();
-        const Variables = srv.getVariables();
+        const Variables = Srv.getVariables();
         const NewVariables: TypedVariableModel[] = [];
         let Tmp: TypedVariableModel;
         let NewV: TypedVariableModel;
@@ -522,7 +522,6 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     const PanelComponent = plugin.panel!;
     const timeRange = this.state.liveTime ?? data.timeRange ?? this.timeSrv.timeRange();
     const panelOptions = panel.getOptions();
-
     // Update the event filter (dashboard settings may have changed)
     // Yes this is called ever render for a function that is triggered on every mouse move
     this.eventFilter.onlyLocal = dashboard.graphTooltip === 0;
