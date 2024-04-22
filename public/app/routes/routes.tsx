@@ -77,16 +77,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       routeName: DashboardRoutes.Normal,
       chromeless: true,
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "MySoloPanelPage" */ '../features/dashboard/containers/MySoloPanelPage')
-      ),
-    },
-    //MySoloPanelPage.tsx
-    {
-      path: '/myd-solo/:uid/:slug',
-      pageClass: 'dashboard-solo',
-      routeName: DashboardRoutes.Normal,
-      chromeless: true,
-      component: SafeDynamicImport(
         () => import(/* webpackChunkName: "SoloPanelPage" */ '../features/dashboard/containers/SoloPanelPage')
       ),
     },

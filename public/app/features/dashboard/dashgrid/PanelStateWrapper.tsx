@@ -19,8 +19,9 @@ import {
   TimeRange,
   toDataFrameDTO,
   toUtc,
+  TypedVariableModel,
 } from '@grafana/data';
-import { RefreshEvent } from '@grafana/runtime';
+import { RefreshEvent, getTemplateSrv } from '@grafana/runtime';
 import { VizLegendOptions } from '@grafana/schema';
 import {
   ErrorBoundary,
@@ -99,14 +100,14 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
         sync: this.getSync,
         onSeriesColorChange: this.onSeriesColorChange,
         onToggleSeriesVisibility: this.onSeriesVisibilityChange,
-        onAnnotationCreate: this.onAnnotationCreate,
-        onAnnotationUpdate: this.onAnnotationUpdate,
-        onAnnotationDelete: this.onAnnotationDelete,
+        onAnnotationCreate: undefined,
+        onAnnotationUpdate: undefined,
+        onAnnotationDelete: undefined, // Annotation delete 
         onInstanceStateChange: this.onInstanceStateChange,
         onToggleLegendSort: this.onToggleLegendSort,
-        canAddAnnotations: props.dashboard.canAddAnnotations.bind(props.dashboard),
-        canEditAnnotations: props.dashboard.canEditAnnotations.bind(props.dashboard),
-        canDeleteAnnotations: props.dashboard.canDeleteAnnotations.bind(props.dashboard),
+        canAddAnnotations: undefined,
+        canEditAnnotations: undefined,
+        canDeleteAnnotations: undefined,// Annotation delete 
         onAddAdHocFilter: this.onAddAdHocFilter,
         onUpdateData: this.onUpdateData,
       },
@@ -191,13 +192,13 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    const { panel, dashboard } = this.props;
+    const { dashboard, panel } = this.props;
 
     // Subscribe to panel events
     this.subs.add(panel.events.subscribe(RefreshEvent, this.onRefresh));
     this.subs.add(panel.events.subscribe(RenderEvent, this.onRender));
 
-    dashboard.panelInitialized(this.props.panel);
+    dashboard.panelInitialized(panel);
 
     // Move snapshot data into the query response
     if (this.hasPanelSnapshot) {
@@ -223,6 +224,38 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
 
     // Listen for live timer events
     liveTimer.listen(this);
+    const receiveMessage = (event: any) => {
+      if (event.data.variables != undefined) {
+        const Change = event.data.variables;
+        const Srv = getTemplateSrv();
+        const Variables = Srv.getVariables();
+        const NewVariables: TypedVariableModel[] = [];
+        let Tmp: TypedVariableModel;
+        let NewV: TypedVariableModel;
+        Change.forEach((c) => {
+          Tmp = Variables.find((v) => v.name === c.key);
+          if (Tmp != undefined) {
+            NewV = { ...Tmp };
+            NewV.current = { ...Tmp.current, value: c.value };
+            NewVariables.push(NewV);
+          }
+        });
+        if (NewVariables.length > 0) {
+          Srv.init(NewVariables);
+          this.onRefresh();
+        }
+      }
+      if (event.data.timeRange != undefined) {
+        this.onChangeTimeRange(event.data.timeRange);
+      }
+    };
+
+    window.addEventListener('message', receiveMessage);
+
+    return () => {
+      window.removeEventListener('message', receiveMessage);
+    };
+
   }
 
   componentWillUnmount() {
@@ -272,13 +305,14 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     if (width !== prevProps.width) {
       liveTimer.updateInterval(this);
     }
+
   }
 
   // Updates the response with information from the stream
   // The next is outside a react synthetic event so setState is not batched
   // So in this context we can only do a single call to setState
   onDataUpdate(data: PanelData) {
-    const { dashboard, panel, plugin } = this.props;
+    const { dashboard, plugin, panel } = this.props;
 
     // Ignore this data update if we are now a non data panel
     if (plugin.meta.skipDataQuery) {
@@ -326,15 +360,13 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
   }
 
   onRefresh = () => {
-    const { dashboard, panel, isInView, width } = this.props;
-
+    const { dashboard, isInView, width, panel } = this.props;
     if (!isInView) {
       this.setState({ refreshWhenInView: true });
       return;
     }
 
     const timeData = applyPanelTimeOverrides(panel, this.timeSrv.timeRange());
-
     // Issue Query
     if (this.wantsQueryExecution) {
       if (width < 0) {
@@ -440,6 +472,10 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     });
   };
 
+  onChangeTimeRangeOverride = (timeRange: AbsoluteTimeRange) => {
+    return;
+  };
+
   shouldSignalRenderingCompleted(loadingState: LoadingState, pluginMeta: PanelPluginMeta) {
     return loadingState === LoadingState.Done || loadingState === LoadingState.Error || pluginMeta.skipDataQuery;
   }
@@ -468,7 +504,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
   };
 
   renderPanelContent(innerWidth: number, innerHeight: number) {
-    const { panel, plugin, dashboard } = this.props;
+    const { plugin, dashboard, panel } = this.props;
     const { renderCounter, data } = this.state;
     const { state: loadingState } = data;
 
@@ -486,11 +522,9 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     const PanelComponent = plugin.panel!;
     const timeRange = this.state.liveTime ?? data.timeRange ?? this.timeSrv.timeRange();
     const panelOptions = panel.getOptions();
-
     // Update the event filter (dashboard settings may have changed)
     // Yes this is called ever render for a function that is triggered on every mouse move
     this.eventFilter.onlyLocal = dashboard.graphTooltip === 0;
-
     return (
       <>
         <PanelContextProvider value={this.state.context}>
@@ -509,7 +543,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
             replaceVariables={panel.replaceVariables}
             onOptionsChange={this.onOptionsChange}
             onFieldConfigChange={this.onFieldConfigChange}
-            onChangeTimeRange={this.onChangeTimeRange}
+            onChangeTimeRange={this.onChangeTimeRangeOverride}
             eventBus={dashboard.events}
           />
         </PanelContextProvider>
@@ -518,11 +552,11 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
   }
 
   render() {
-    const { dashboard, panel, width, height, plugin } = this.props;
+    const { dashboard, width, height, plugin, panel } = this.props;
     const { errorMessage, data } = this.state;
     const { transparent } = panel;
 
-    const panelChromeProps = getPanelChromeProps({ ...this.props, data });
+    const panelChromeProps = getPanelChromeProps({ ...this.props, data, panel });
 
     // Shift the hover menu down if it's on the top row so it doesn't get clipped by topnav
     const hoverHeaderOffset = (panel.gridPos?.y ?? 0) === 0 ? -16 : undefined;
